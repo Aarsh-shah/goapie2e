@@ -1,0 +1,25 @@
+syntax="proto3";
+
+option go_package="a/b1";
+package aarshserver;
+
+service TardisFeatureService {
+  rpc GetFeatures(TardisGetFeatureRequest) returns (TardisGetFeaturesResponse);
+  rpc GetCounters(TardisGetCountersRequest) returns (TardisGetCountersResponse);
+}
+
+message TardisGetFeatureRequest {
+  string feature_name = 1;
+}
+
+message TardisGetFeaturesResponse {
+  string features = 2;
+}
+
+message TardisGetCountersRequest {
+  string counter = 1;
+}
+
+message TardisGetCountersResponse {
+  int32 counters = 2;
+}
