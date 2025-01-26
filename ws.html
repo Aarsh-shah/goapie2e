@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium WebSocket Chat</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .chat-container {
+      width: 90%;
+      max-width: 400px;
+      height: 80%; /* Adjusted height for fixed chat container */
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: fixed; /* Ensures the chat stays fixed on screen */
+    }
+    .chat-header {
+      background: #4a90e2;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+    }
+    #messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto; /* Enables scrolling inside the messages section */
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #f4f6f8;
+    }
+    .message {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 15px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    .message.server {
+      background: #e8f0fe;
+      color: #333;
+      align-self: flex-start;
+      border-top-left-radius: 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .message.client {
+      background: #4a90e2;
+      color: #fff;
+      align-self: flex-end;
+      border-top-right-radius: 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    #input {
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background: #fff;
+    }
+    #input input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 10px 15px;
+      border-radius: 20px;
+      background: #f4f6f8;
+      margin-right: 10px;
+      font-size: 14px;
+    }
+    #input button {
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #input button:hover {
+      background: #357ab8;
+    }
+  </style>
+</head>
+<body>
+<div class="chat-container">
+  <div class="chat-header">WebSocket Chat</div>
+  <div id="messages"></div>
+  <div id="input">
+    <input type="text" id="messageInput" placeholder="Type your message..." />
+    <button id="sendButton">Send</button>
+  </div>
+</div>
+
+<script>
+  const socket = new WebSocket("ws://localhost:8080/ws");
+
+  const messagesDiv = document.getElementById("messages");
+  const messageInput = document.getElementById("messageInput");
+  const sendButton = document.getElementById("sendButton");
+
+  const addMessage = (message, type = "server") => {
+    const messageElem = document.createElement("div");
+    messageElem.textContent = message;
+    messageElem.classList.add("message", type);
+    messagesDiv.appendChild(messageElem);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+  };
+
+  socket.onopen = () => {
+    console.log("WebSocket connection established!");
+    addMessage("Connected to the server!", "server");
+  };
+
+  socket.onmessage = (event) => {
+    console.log("Message from server:", event.data);
+    addMessage(event.data, "server");
+  };
+
+  socket.onclose = () => {
+    console.log("WebSocket connection closed.");
+    addMessage("Connection closed.", "server");
+  };
+
+  socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+  };
+
+  sendButton.addEventListener("click", () => {
+    const message = messageInput.value.trim();
+    if (message && socket.readyState === WebSocket.OPEN) {
+      socket.send(message);
+      addMessage(message, "client");
+      messageInput.value = "";
+    } else if (!message) {
+      alert("Please type a message.");
+    } else {
+      alert("WebSocket is not connected.");
+    }
+  });
+
+  messageInput.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      sendButton.click();
+    }
+  });
+</script>
+</body>
+</html>

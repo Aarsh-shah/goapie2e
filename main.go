@@ -6,27 +6,15 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"math"
 	"net"
 )
 
 //TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
 
-func main() {
-	//TIP <p>Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined text
-	// to see how GoLand suggests fixing the warning.</p><p>Alternatively, if available, click the lightbulb to view possible fixes.</p>
-	s := "gopher"
-	fmt.Println("Hello and welcome", s)
-
-	for i := 1; i <= 5; i++ {
-		//TIP <p>To start your debugging session, right-click your code in the editor and select the Debug option.</p> <p>We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-		// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.</p>
-		fmt.Println("i =", 100/i)
-	}
-	fmt.Println(math.Acosh(5))
+func main2() {
 	grpc_middleware.ChainStreamClient()
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", ":8085")
 	if err != nil {
 		fmt.Println(err)
 
@@ -59,6 +47,7 @@ func NewAarshServer() *AarshServerImpl {
 
 // Implement the GetFeatures method as defined in the interface
 func (a AarshServerImpl) GetFeatures(ctx context.Context, req *TardisGetFeatureRequest) (*TardisGetFeaturesResponse, error) {
+	//time.Sleep(20 * time.Millisecond)
 	return &TardisGetFeaturesResponse{Features: req.FeatureName + req.FeatureName}, nil
 }
 
